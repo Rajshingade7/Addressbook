@@ -1,4 +1,6 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Addressbook = void 0;
 class Addressbook {
     constructor(firstname, lastname, address, city, state, zip, phonenumber, email) {
         this.firstname = firstname;
@@ -12,4 +14,5 @@ class Addressbook {
         console.log("Hello Guys!! Welcome to addressbook");
     }
 }
+exports.Addressbook = Addressbook;
 var firstrecord = new Addressbook('Raj', "Shingade", "cidco,Aurangabad", "Aurangabad", "Maharashtra", 1234, 9834567890, "raj@gmail.com");
