@@ -28,7 +28,42 @@ class Addressbook {
     public viewContacts(): void {
         this.contacts.forEach(contact => console.log(contact));
     }
+
+    public findContactByName(firstName: string, lastName: string): Contact | undefined {
+        return this.contacts.find(contact => contact.firstName === firstName && contact.lastName === lastName);
+    }
+
+    public editContact(firstName: string, lastName: string) {
+        const contact = this.findContactByName(firstName, lastName);
+        if (contact) {
+            rl.question('Enter new address: ', (address) => {
+                rl.question('Enter new city: ', (city) => {
+                    rl.question('Enter new state: ', (state) => {
+                        rl.question('Enter new zip: ', (zip) => {
+                            rl.question('Enter new phone: ', (phone) => {
+                                rl.question('Enter new email: ', (email) => {
+                                    contact.address = address;
+                                    contact.city = city;
+                                    contact.state = state;
+                                    contact.zip = zip;
+                                    contact.phone = phone;
+                                    contact.email = email;
+                                    console.log('Contact details updated successfully.');
+                                    promptForEdit(); // After updating, prompt again for further actions
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        } else {
+            console.log('Contact not found.');
+            promptForEdit(); 
+        }
+    }
 }
+
+let addressBook = new Addressbook();
 
 function promptForContactDetails() {
     rl.question('Enter first name: ', (firstName) => {
@@ -47,6 +82,7 @@ function promptForContactDetails() {
                                         } else {
                                             rl.close();
                                             addressBook.viewContacts();
+                                            promptForEdit(); // After adding contacts, prompt for editing
                                         }
                                     });
                                 });
@@ -59,6 +95,12 @@ function promptForContactDetails() {
     });
 }
 
-let addressBook = new Addressbook();
+function promptForEdit() {
+    rl.question('Enter first name of the contact you want to edit: ', (firstName) => {
+        rl.question('Enter last name of the contact you want to edit: ', (lastName) => {
+            addressBook.editContact(firstName, lastName);
+        });
+    });
+}
 
 promptForContactDetails();
