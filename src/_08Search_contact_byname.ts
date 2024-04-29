@@ -16,28 +16,19 @@ class Contact {
         public phone: string,
         public email: string
     ) {}
-
-    public equals(other: Contact): boolean {
-        return this.firstName === other.firstName && this.lastName === other.lastName;
-    }
 }
 
 class AddressBook {
     private contacts: Contact[] = [];
 
     public addContact(contact: Contact): void {
-        const existingContact = this.contacts.find(c => c.equals(contact));
-        if (!existingContact) {
-            this.contacts.push(contact);
-            console.log('Contact added successfully.');
-        } else {
-            console.log('Duplicate contact. Contact not added.');
-        }
+        this.contacts.push(contact);
     }
 
     public viewContacts(): void {
         this.contacts.forEach(contact => console.log(contact));
     }
+
     public searchContactsByCityOrState(cityOrState: string): Contact[] {
         return this.contacts.filter(contact => contact.city === cityOrState || contact.state === cityOrState);
     }
@@ -45,7 +36,7 @@ class AddressBook {
 
 class AddressBookSystem {
     private addressBooks: { [name: string]: AddressBook } = {};
-    //Here in this case it is taking key as a string and value as an object
+
     public addAddressBook(name: string): void {
         if (!this.addressBooks[name]) {
             this.addressBooks[name] = new AddressBook();
@@ -58,6 +49,7 @@ class AddressBookSystem {
     public getAddressBook(name: string): AddressBook | undefined {
         return this.addressBooks[name];
     }
+
     public searchContactsByCityOrState(cityOrState: string): Contact[] {
         const contacts: Contact[] = [];
         for (const addressBookName in this.addressBooks) {
@@ -113,26 +105,6 @@ function promptForContactDetails(addressBook: AddressBook) {
     });
 }
 
-function promptForAction() {
-    rl.question('Do you want to add a new address book, add a new contact, view contacts, or exit? (addbook/add/view/exit): ', (answer) => {
-        if (answer.toLowerCase() === 'addbook') {
-            promptForNewAddressBook();
-        } else if (answer.toLowerCase() === 'add') {
-            promptForNewContact();
-        } else if (answer.toLowerCase() === 'view') {
-            promptForViewContacts();
-        } else if (answer.toLowerCase() === 'search') {
-            promptForSearchContacts();
-        }
-         else if (answer.toLowerCase() === 'exit') {
-            rl.close();
-        } else {
-            console.log('Invalid option. Please try again.');
-            promptForAction();
-        }
-    });
-}
-
 function promptForViewContacts() {
     rl.question('Enter the name of the address book to view contacts: ', (name) => {
         const addressBook = addressBookSystem.getAddressBook(name);
@@ -144,6 +116,7 @@ function promptForViewContacts() {
         promptForAction();
     });
 }
+
 function promptForSearchContacts() {
     rl.question('Enter city or state to search contacts: ', (cityOrState) => {
         const contacts = addressBookSystem.searchContactsByCityOrState(cityOrState);
@@ -157,5 +130,23 @@ function promptForSearchContacts() {
     });
 }
 
+function promptForAction() {
+    rl.question('Do you want to add a new address book, add a new contact, view contacts, search contacts, or exit? (addbook/add/view/search/exit): ', (answer) => {
+        if (answer.toLowerCase() === 'addbook') {
+            promptForNewAddressBook();
+        } else if (answer.toLowerCase() === 'add') {
+            promptForNewContact();
+        } else if (answer.toLowerCase() === 'view') {
+            promptForViewContacts();
+        } else if (answer.toLowerCase() === 'search') {
+            promptForSearchContacts();
+        } else if (answer.toLowerCase() === 'exit') {
+            rl.close();
+        } else {
+            console.log('Invalid option. Please try again.');
+            promptForAction();
+        }
+    });
+}
 
 promptForAction();

@@ -16,28 +16,19 @@ class Contact {
         public phone: string,
         public email: string
     ) {}
-
-    public equals(other: Contact): boolean {
-        return this.firstName === other.firstName && this.lastName === other.lastName;
-    }
 }
 
 class AddressBook {
     private contacts: Contact[] = [];
 
     public addContact(contact: Contact): void {
-        const existingContact = this.contacts.find(c => c.equals(contact));
-        if (!existingContact) {
-            this.contacts.push(contact);
-            console.log('Contact added successfully.');
-        } else {
-            console.log('Duplicate contact. Contact not added.');
-        }
+        this.contacts.push(contact);
     }
 
     public viewContacts(): void {
         this.contacts.forEach(contact => console.log(contact));
     }
+
     public searchContactsByCityOrState(cityOrState: string): Contact[] {
         return this.contacts.filter(contact => contact.city === cityOrState || contact.state === cityOrState);
     }
@@ -45,7 +36,9 @@ class AddressBook {
 
 class AddressBookSystem {
     private addressBooks: { [name: string]: AddressBook } = {};
-    //Here in this case it is taking key as a string and value as an object
+    private cityToPersons: { [city: string]: Contact[] } = {};
+    private stateToPersons: { [state: string]: Contact[] } = {};
+
     public addAddressBook(name: string): void {
         if (!this.addressBooks[name]) {
             this.addressBooks[name] = new AddressBook();
@@ -58,6 +51,7 @@ class AddressBookSystem {
     public getAddressBook(name: string): AddressBook | undefined {
         return this.addressBooks[name];
     }
+
     public searchContactsByCityOrState(cityOrState: string): Contact[] {
         const contacts: Contact[] = [];
         for (const addressBookName in this.addressBooks) {
@@ -67,6 +61,42 @@ class AddressBookSystem {
             }
         }
         return contacts;
+    }
+
+    public addToCityDictionary(contact: Contact): void {
+        if (!this.cityToPersons[contact.city]) {
+            this.cityToPersons[contact.city] = [contact];
+        } else {
+            this.cityToPersons[contact.city].push(contact);
+        }
+    }
+
+    public addToStateDictionary(contact: Contact): void {
+        if (!this.stateToPersons[contact.state]) {
+            this.stateToPersons[contact.state] = [contact];
+        } else {
+            this.stateToPersons[contact.state].push(contact);
+        }
+    }
+
+    public viewPersonsByCity(city: string): void {
+        const persons = this.cityToPersons[city];
+        if (persons) {
+            console.log(`Persons in ${city}:`);
+            persons.forEach(person => console.log(`${person.firstName} ${person.lastName}`));
+        } else {
+            console.log(`No persons found in ${city}.`);
+        }
+    }
+
+    public viewPersonsByState(state: string): void {
+        const persons = this.stateToPersons[state];
+        if (persons) {
+            console.log(`Persons in ${state}:`);
+            persons.forEach(person => console.log(`${person.firstName} ${person.lastName}`));
+        } else {
+            console.log(`No persons found in ${state}.`);
+        }
     }
 }
 
@@ -102,6 +132,8 @@ function promptForContactDetails(addressBook: AddressBook) {
                                 rl.question('Enter Email: ', (email) => {
                                     const contact = new Contact(firstName, lastName, address, city, state, zip, phone, email);
                                     addressBook.addContact(contact);
+                                    addressBookSystem.addToCityDictionary(contact);
+                                    addressBookSystem.addToStateDictionary(contact);
                                     promptForAction();
                                 });
                             });
@@ -110,26 +142,6 @@ function promptForContactDetails(addressBook: AddressBook) {
                 });
             });
         });
-    });
-}
-
-function promptForAction() {
-    rl.question('Do you want to add a new address book, add a new contact, view contacts, or exit? (addbook/add/view/exit): ', (answer) => {
-        if (answer.toLowerCase() === 'addbook') {
-            promptForNewAddressBook();
-        } else if (answer.toLowerCase() === 'add') {
-            promptForNewContact();
-        } else if (answer.toLowerCase() === 'view') {
-            promptForViewContacts();
-        } else if (answer.toLowerCase() === 'search') {
-            promptForSearchContacts();
-        }
-         else if (answer.toLowerCase() === 'exit') {
-            rl.close();
-        } else {
-            console.log('Invalid option. Please try again.');
-            promptForAction();
-        }
     });
 }
 
@@ -144,6 +156,7 @@ function promptForViewContacts() {
         promptForAction();
     });
 }
+
 function promptForSearchContacts() {
     rl.question('Enter city or state to search contacts: ', (cityOrState) => {
         const contacts = addressBookSystem.searchContactsByCityOrState(cityOrState);
@@ -157,5 +170,41 @@ function promptForSearchContacts() {
     });
 }
 
+function promptForViewPersonsByCity() {
+    rl.question('Enter city to view persons: ', (city) => {
+        addressBookSystem.viewPersonsByCity(city);
+        promptForAction();
+    });
+}
+
+function promptForViewPersonsByState() {
+    rl.question('Enter state to view persons: ', (state) => {
+        addressBookSystem.viewPersonsByState(state);
+        promptForAction();
+    });
+}
+
+function promptForAction() {
+    rl.question('Do you want to add a new address book, add a new contact, view contacts, search contacts, view persons by city, view persons by state, or exit? (addbook/add/view/search/viewcity/viewstate/exit): ', (answer) => {
+        if (answer.toLowerCase() === 'addbook') {
+            promptForNewAddressBook();
+        } else if (answer.toLowerCase() === 'add') {
+            promptForNewContact();
+        } else if (answer.toLowerCase() === 'view') {
+            promptForViewContacts();
+        } else if (answer.toLowerCase() === 'search') {
+            promptForSearchContacts();
+        } else if (answer.toLowerCase() === 'viewcity') {
+            promptForViewPersonsByCity();
+        } else if (answer.toLowerCase() === 'viewstate') {
+            promptForViewPersonsByState();
+        } else if (answer.toLowerCase() === 'exit') {
+            rl.close();
+        } else {
+            console.log('Invalid option. Please try again.');
+            promptForAction();
+        }
+    });
+}
 
 promptForAction();
