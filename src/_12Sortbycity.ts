@@ -247,6 +247,7 @@ function promptForsortcontactbycity(){
         else{
             console.log(`Address book with name '${city}' does not exist.`);
         }
+        promptForAction();
     })
 }
 
