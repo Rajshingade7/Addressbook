@@ -28,38 +28,14 @@ class AddressBook {
     public viewContacts(): void {
         this.contacts.forEach(contact => console.log(contact));
     }
-
-    public findContactByName(firstName: string, lastName: string): Contact | undefined {
-        return this.contacts.find(contact => contact.firstName === firstName && contact.lastName === lastName);
-    }
-
-    public deleteContact(firstName: string, lastName: string): void {
-        const index = this.contacts.findIndex(contact => contact.firstName === firstName && contact.lastName === lastName);
-        if (index !== -1) {
-            this.contacts.splice(index, 1);
-            console.log('Contact deleted successfully.');
-        } else {
-            console.log('Contact not found.');
-        }
-    }
-
-    public editContact(firstName: string, lastName: string, updatedContact: Contact): void {
-        const index = this.contacts.findIndex(contact => contact.firstName === firstName && contact.lastName === lastName);
-        if (index !== -1) {
-            this.contacts[index] = updatedContact;
-            console.log('Contact details updated successfully.');
-        } else {
-            console.log('Contact not found.');
-        }
-    }
 }
 
 class AddressBookSystem {
-    private addressBooks: { [name: string]: AddressBook } = {};
+    private addressBooks: Map<string, AddressBook> = new Map();
 
     public addAddressBook(name: string): void {
-        if (!this.addressBooks[name]) {
-            this.addressBooks[name] = new AddressBook();
+        if (!this.addressBooks.has(name)) {
+            this.addressBooks.set(name, new AddressBook());
             console.log(`Address book '${name}' added successfully.`);
         } else {
             console.log(`Address book with name '${name}' already exists.`);
@@ -67,16 +43,7 @@ class AddressBookSystem {
     }
 
     public getAddressBook(name: string): AddressBook | undefined {
-        return this.addressBooks[name];
-    }
-
-    public deleteAddressBook(name: string): void {
-        if (this.addressBooks[name]) {
-            delete this.addressBooks[name];
-            console.log(`Address book '${name}' deleted successfully.`);
-        } else {
-            console.log(`Address book with name '${name}' does not exist.`);
-        }
+        return this.addressBooks.get(name);
     }
 }
 
@@ -90,39 +57,13 @@ function promptForNewAddressBook() {
 }
 
 function promptForAction() {
-    rl.question('Do you want to add a new address book, view contacts, delete an address book, or exit? (add/view/delete/exit): ', (answer) => {
-        if (answer.toLowerCase() === 'add') {
+    rl.question('Do you want to add a new address book? (yes/no): ', (answer) => {
+        if (answer.toLowerCase() === 'yes') {
             promptForNewAddressBook();
-        } else if (answer.toLowerCase() === 'view') {
-            promptForViewContacts();
-        } else if (answer.toLowerCase() === 'delete') {
-            promptForDeleteAddressBook();
-        } else if (answer.toLowerCase() === 'exit') {
+        } else {
             rl.close();
-        } else {
-            console.log('Invalid option. Please try again.');
-            promptForAction();
         }
     });
 }
 
-function promptForViewContacts() {
-    rl.question('Enter the name of the address book to view contacts: ', (name) => {
-        const addressBook = addressBookSystem.getAddressBook(name);
-        if (addressBook) {
-            addressBook.viewContacts();
-        } else {
-            console.log(`Address book with name '${name}' does not exist.`);
-        }
-        promptForAction();
-    });
-}
-
-function promptForDeleteAddressBook() {
-    rl.question('Enter the name of the address book to delete: ', (name) => {
-        addressBookSystem.deleteAddressBook(name);
-        promptForAction();
-    });
-}
-
-promptForAction();
+promptForNewAddressBook();
