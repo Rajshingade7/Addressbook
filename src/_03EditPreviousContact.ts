@@ -49,7 +49,7 @@ class Addressbook {
                                     contact.phone = phone;
                                     contact.email = email;
                                     console.log('Contact details updated successfully.');
-                                    promptForEdit(); // After updating, prompt again for further actions
+                                    addressBook.viewContacts();
                                 });
                             });
                         });
@@ -80,9 +80,8 @@ function promptForContactDetails() {
                                         if (answer.toLowerCase() === 'yes') {
                                             promptForContactDetails();
                                         } else {
-                                            rl.close();
                                             addressBook.viewContacts();
-                                            promptForEdit(); // After adding contacts, prompt for editing
+                                            promptForEdit(); 
                                         }
                                     });
                                 });

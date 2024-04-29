@@ -89,7 +89,6 @@ function promptForContactDetails() {
                                         if (answer.toLowerCase() === 'yes') {
                                             promptForContactDetails();
                                         } else {
-                                            rl.close();
                                             addressBook.viewContacts();
                                             promptForEditOrDelete();
                                         }

@@ -89,7 +89,6 @@ function promptForContactDetails() {
                                             promptForContactDetails();
                                         }
                                         else {
-                                            rl.close();
                                             addressBook.viewContacts();
                                             promptForEditOrDelete();
                                         }

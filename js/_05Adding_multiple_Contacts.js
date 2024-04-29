@@ -28,42 +28,9 @@ var Addressbook = /** @class */ (function () {
     Addressbook.prototype.viewContacts = function () {
         this.contacts.forEach(function (contact) { return console.log(contact); });
     };
-    Addressbook.prototype.findContactByName = function (firstName, lastName) {
-        return this.contacts.find(function (contact) { return contact.firstName === firstName && contact.lastName === lastName; });
-    };
-    Addressbook.prototype.editContact = function (firstName, lastName) {
-        var contact = this.findContactByName(firstName, lastName);
-        if (contact) {
-            rl.question('Enter new address: ', function (address) {
-                rl.question('Enter new city: ', function (city) {
-                    rl.question('Enter new state: ', function (state) {
-                        rl.question('Enter new zip: ', function (zip) {
-                            rl.question('Enter new phone: ', function (phone) {
-                                rl.question('Enter new email: ', function (email) {
-                                    contact.address = address;
-                                    contact.city = city;
-                                    contact.state = state;
-                                    contact.zip = zip;
-                                    contact.phone = phone;
-                                    contact.email = email;
-                                    console.log('Contact details updated successfully.');
-                                    addressBook.viewContacts();
-                                });
-                            });
-                        });
-                    });
-                });
-            });
-        }
-        else {
-            console.log('Contact not found.');
-            promptForEdit();
-        }
-    };
     return Addressbook;
 }());
-var addressBook = new Addressbook();
-function promptForContactDetails() {
+function promptForContactDetails(addressBook) {
     rl.question('Enter first name: ', function (firstName) {
         rl.question('Enter last name: ', function (lastName) {
             rl.question('Enter address: ', function (address) {
@@ -76,11 +43,11 @@ function promptForContactDetails() {
                                     addressBook.addContact(contact);
                                     rl.question('Do you want to add another contact? (yes/no): ', function (answer) {
                                         if (answer.toLowerCase() === 'yes') {
-                                            promptForContactDetails();
+                                            promptForContactDetails(addressBook);
                                         }
                                         else {
+                                            rl.close();
                                             addressBook.viewContacts();
-                                            promptForEdit();
                                         }
                                     });
                                 });
@@ -92,11 +59,5 @@ function promptForContactDetails() {
         });
     });
 }
-function promptForEdit() {
-    rl.question('Enter first name of the contact you want to edit: ', function (firstName) {
-        rl.question('Enter last name of the contact you want to edit: ', function (lastName) {
-            addressBook.editContact(firstName, lastName);
-        });
-    });
-}
-promptForContactDetails();
+var addressBook = new Addressbook();
+promptForContactDetails(addressBook);
